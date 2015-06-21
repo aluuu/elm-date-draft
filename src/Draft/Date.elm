@@ -1,6 +1,9 @@
-module Draft.Date where
+module Draft.Date (Date, Year, Month, Day, year, month, day,
+                   toOrdinalDate, fromOrdinaldate, toGregorian, fromGregorian,
+                   dayOfYear) where
 
 import Array
+import Draft.Utils exposing (clip)
 
 
 type alias Day = Int
@@ -12,13 +15,6 @@ type alias Year = Int
 -- field name is julianDay but actualy it is modified julian day,
 -- see https://en.wikipedia.org/wiki/Julian_day for details
 type alias Date = { julianDay: Int }
-
-clip : comparable -> comparable -> comparable -> comparable
-clip a b x =
-  if | x < a -> a
-     | x > b -> b
-     | otherwise -> x
-
 
 toOrdinalDate : Date -> (Year, Day)
 toOrdinalDate {julianDay} =
@@ -36,7 +32,6 @@ toOrdinalDate {julianDay} =
   in
     (year, yearDay)
 
-
 fromOrdinalDate : (Year, Int) -> Date
 fromOrdinalDate (year, day) =
   let
@@ -46,11 +41,9 @@ fromOrdinalDate (year, day) =
   in
    {julianDay = yearDay + (365 * y) + (y // 4) - (y // 100) + (y // 400) - 678576}
 
-
 isLeap : Year -> Bool
 isLeap year =
   ((year % 4) == 0) && ((year % 100) /= 0 || (year % 400) == 0)
-
 
 toMonthDay : List Int -> Int -> (Month, Day)
 toMonthDay (n::ns) yearDay =
@@ -62,7 +55,6 @@ toMonthDay (n::ns) yearDay =
   else
      (1, yearDay)
 
-
 daysInMonths : Year -> List Int
 daysInMonths year =
   let
@@ -70,14 +62,11 @@ daysInMonths year =
   in
    [31, if isLeap' then 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-
 dayOfYear : Date -> Day
 dayOfYear date = let (year, yearDay) = toOrdinalDate date in yearDay
 
-
 year : Date -> Year
 year date = let (year, yearDay) = toOrdinalDate date in year
-
 
 month : Date -> Month
 month date =
@@ -87,7 +76,6 @@ month date =
   in
    month
 
-
 day : Date -> Day
 day date =
   let
@@ -96,7 +84,6 @@ day date =
   in
    monthDay
 
-
 toGregorian : Date -> (Year, Month, Day)
 toGregorian date =
   let
@@ -104,7 +91,6 @@ toGregorian date =
     (month, monthDay) = toMonthDay (daysInMonths year') yearDay'
   in
    (year', month, monthDay)
-
 
 monthLength : Year -> Month -> Int
 monthLength year month =
@@ -116,7 +102,6 @@ monthLength year month =
    case monthLength of
      Nothing -> 30
      Just x -> x
-
 
 fromGregorianToOrdinal : (Year, Month, Day) -> (Year, Day)
 fromGregorianToOrdinal (year, month, monthDay) =
@@ -130,7 +115,6 @@ fromGregorianToOrdinal (year, month, monthDay) =
     yearDay = ((367 * month' - 362) // 12) + k + day'
   in
     (year, yearDay)
-
 
 fromGregorian : (Year, Month, Day) -> Date
 fromGregorian gregorianDate =
