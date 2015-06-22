@@ -1,5 +1,6 @@
 module Draft.Date (Date, Year, Month, Day, year, month, day,
-                   toOrdinalDate, fromOrdinaldate, toGregorian, fromGregorian,
+                   toOrdinalDate, fromOrdinalDate, toGregorian, fromGregorian,
+                   addDays, addMonths, addYears, diffDays,
                    dayOfYear) where
 
 import Array
@@ -119,3 +120,22 @@ fromGregorianToOrdinal (year, month, monthDay) =
 fromGregorian : (Year, Month, Day) -> Date
 fromGregorian gregorianDate =
    fromGregorianToOrdinal gregorianDate |> fromOrdinalDate
+
+addDays : Int -> Date -> Date
+addDays daysCount date = { date | julianDay <- (date.julianDay + daysCount) }
+
+diffDays : Date -> Date -> Int
+diffDays dateA dateB = dateA.julianDay - dateB.julianDay
+
+addMonths : Int -> Date -> Date
+addMonths monthsCount date =
+  let
+    (year, month, monthDay) = toGregorian date
+    rolloverMonths y m = (y + ((m - 1) // 12), ((m - 1) % 12) + 1)
+    (year', month') = rolloverMonths year (month + monthsCount)
+  in
+   fromGregorian (year', month', monthDay)
+
+addYears : Int -> Date -> Date
+addYears yearsCount date =
+  addMonths (yearsCount * 12) date
