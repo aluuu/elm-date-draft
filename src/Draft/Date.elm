@@ -1,11 +1,28 @@
-module Draft.Date (Date, Year, Month, Day, year, month, day,
+module Draft.Date (Date, Date', year, month, day,
                    toOrdinalDate, fromOrdinalDate, toGregorian, fromGregorian,
                    addDays, addMonths, addYears, diffDays,
                    dayOfYear) where
 
+{-| Date manipulation module
+
+# Types
+@docs Date
+
+# Constructors
+
+@docs fromOrdinalDate, fromGregorian
+
+# Accessing and manipulation
+
+@docs day, month, year, dayOfYear, addDays, addMonths, addYears, diffDays
+
+# Conversations
+
+@docs toOrdinalDate, toGregorian
+-}
+
 import Array
 import Draft.Utils exposing (clip)
-
 
 type alias Day = Int
 
@@ -13,11 +30,12 @@ type alias Month = Int
 
 type alias Year = Int
 
--- field name is julianDay but actualy it is modified julian day,
--- see https://en.wikipedia.org/wiki/Julian_day for details
-type alias Date = { julianDay: Int }
+{-| Modified Julian day -}
+type alias Date' a = { a | julianDay: Int }
 
-toOrdinalDate : Date -> (Year, Day)
+type alias Date = Date' {}
+
+toOrdinalDate : Date' a -> (Year, Day)
 toOrdinalDate {julianDay} =
   let
     a = julianDay + 678575
@@ -66,10 +84,10 @@ daysInMonths year =
 dayOfYear : Date -> Day
 dayOfYear date = let (year, yearDay) = toOrdinalDate date in yearDay
 
-year : Date -> Year
+year : Date' a -> Year
 year date = let (year, yearDay) = toOrdinalDate date in year
 
-month : Date -> Month
+month : Date' a -> Month
 month date =
   let
     (year', yearDay') = toOrdinalDate date
@@ -77,7 +95,7 @@ month date =
   in
    month
 
-day : Date -> Day
+day : Date' a -> Day
 day date =
   let
     (year', yearDay') = toOrdinalDate date
@@ -85,7 +103,7 @@ day date =
   in
    monthDay
 
-toGregorian : Date -> (Year, Month, Day)
+toGregorian : Date' a -> (Year, Month, Day)
 toGregorian date =
   let
     (year', yearDay') = toOrdinalDate date
@@ -121,13 +139,13 @@ fromGregorian : (Year, Month, Day) -> Date
 fromGregorian gregorianDate =
    fromGregorianToOrdinal gregorianDate |> fromOrdinalDate
 
-addDays : Int -> Date -> Date
+addDays : Int -> Date' a -> Date' a
 addDays daysCount date = { date | julianDay <- (date.julianDay + daysCount) }
 
-diffDays : Date -> Date -> Int
+diffDays : Date' a -> Date' a -> Int
 diffDays dateA dateB = dateA.julianDay - dateB.julianDay
 
-addMonths : Int -> Date -> Date
+addMonths : Int -> Date' a -> Date
 addMonths monthsCount date =
   let
     (year, month, monthDay) = toGregorian date
@@ -136,6 +154,6 @@ addMonths monthsCount date =
   in
    fromGregorian (year', month', monthDay)
 
-addYears : Int -> Date -> Date
+addYears : Int -> Date' a -> Date
 addYears yearsCount date =
   addMonths (yearsCount * 12) date
