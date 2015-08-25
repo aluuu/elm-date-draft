@@ -1,4 +1,4 @@
-module Draft.Date (Date, Date', year, month, day,
+module Draft.Date (Date, Date_, year, month, day,
                    toOrdinalDate, fromOrdinalDate, toGregorian, fromGregorian,
                    addDays, addMonths, addYears, diffDays,
                    dayOfYear) where
@@ -6,7 +6,7 @@ module Draft.Date (Date, Date', year, month, day,
 {-| Date manipulation module
 
 # Types
-@docs Date
+@docs Date, Date_
 
 # Constructors
 
@@ -30,12 +30,14 @@ type alias Month = Int
 
 type alias Year = Int
 
-{-| Modified Julian day -}
-type alias Date' a = { a | julianDay: Int }
+{-| Type that symbolizes Modified Julian day -}
+type alias Date_ a = { a | julianDay: Int }
 
-type alias Date = Date' {}
+{-| Finalized version of `Date_` type. -}
+type alias Date = Date_ {}
 
-toOrdinalDate : Date' a -> (Year, Day)
+{-| Returns year and year day for the given date. -}
+toOrdinalDate : Date_ a -> (Year, Day)
 toOrdinalDate {julianDay} =
   let
     a = julianDay + 678575
@@ -51,6 +53,7 @@ toOrdinalDate {julianDay} =
   in
     (year, yearDay)
 
+{-|  -}
 fromOrdinalDate : (Year, Int) -> Date
 fromOrdinalDate (year, day) =
   let
@@ -81,13 +84,16 @@ daysInMonths year =
   in
    [31, if isLeap' then 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
+{-| Returns year day of the given date. -}
 dayOfYear : Date -> Day
 dayOfYear date = let (year, yearDay) = toOrdinalDate date in yearDay
 
-year : Date' a -> Year
+{-| Returns year of the given date. -}
+year : Date_ a -> Year
 year date = let (year, yearDay) = toOrdinalDate date in year
 
-month : Date' a -> Month
+{-| Returns month number of the given date. -}
+month : Date_ a -> Month
 month date =
   let
     (year', yearDay') = toOrdinalDate date
@@ -95,7 +101,8 @@ month date =
   in
    month
 
-day : Date' a -> Day
+{-| Returns month day of the given date. -}
+day : Date_ a -> Day
 day date =
   let
     (year', yearDay') = toOrdinalDate date
@@ -103,7 +110,8 @@ day date =
   in
    monthDay
 
-toGregorian : Date' a -> (Year, Month, Day)
+{-| Returns year, month and month day for the given date. -}
+toGregorian : Date_ a -> (Year, Month, Day)
 toGregorian date =
   let
     (year', yearDay') = toOrdinalDate date
@@ -135,17 +143,21 @@ fromGregorianToOrdinal (year, month, monthDay) =
   in
     (year, yearDay)
 
+{-| Constructs date value from tuple of year, month and month day. -}
 fromGregorian : (Year, Month, Day) -> Date
 fromGregorian gregorianDate =
    fromGregorianToOrdinal gregorianDate |> fromOrdinalDate
 
-addDays : Int -> Date' a -> Date' a
+{-| Adds given number of days to the date. -}
+addDays : Int -> Date_ a -> Date_ a
 addDays daysCount date = { date | julianDay <- (date.julianDay + daysCount) }
 
-diffDays : Date' a -> Date' a -> Int
+{-| Returns difference between to dates in days. -}
+diffDays : Date_ a -> Date_ a -> Int
 diffDays dateA dateB = dateA.julianDay - dateB.julianDay
 
-addMonths : Int -> Date' a -> Date
+{-| Adds given number of months to the date. -}
+addMonths : Int -> Date_ a -> Date
 addMonths monthsCount date =
   let
     (year, month, monthDay) = toGregorian date
@@ -154,6 +166,7 @@ addMonths monthsCount date =
   in
    fromGregorian (year', month', monthDay)
 
-addYears : Int -> Date' a -> Date
+{-| Adds given number of years to the date. -}
+addYears : Int -> Date_ a -> Date
 addYears yearsCount date =
   addMonths (yearsCount * 12) date

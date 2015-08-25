@@ -1,11 +1,11 @@
 module Draft.DateTime where
 
-import Draft.Date as T exposing ( Date, Date' )
-import Draft.Time as T exposing ( Time, Time' )
+import Draft.Date as T exposing ( Date, Date_)
+import Draft.Time as T exposing ( Time, Time_ )
 import Draft.TimeZone exposing ( TimeZone, utc )
 import Draft.Diff exposing ( Diff )
 
-type alias DateTime = Date' (Time' {tz: TimeZone})
+type alias DateTime = Date_ (Time_ {tz: TimeZone})
 
 fromDateAndTime : Date -> Time -> DateTime
 fromDateAndTime d t = {
