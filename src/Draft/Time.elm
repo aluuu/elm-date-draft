@@ -1,10 +1,10 @@
-module Draft.Time (Time, Time_, fromMilliseconds, fromSeconds, toHMS, fromHMS,
-                   milliseconds, seconds, minutes, hours) where
+module Draft.Time (Time(..), fromMilliseconds, fromSeconds,
+                   toHMS, fromHMS, milliseconds, seconds, minutes, hours) where
 
 {-| Time manipulation module
 
 # Types
-@docs Time, Time_
+@docs Time
 
 # Constructors
 
@@ -22,36 +22,31 @@ module Draft.Time (Time, Time_, fromMilliseconds, fromSeconds, toHMS, fromHMS,
 import Draft.Utils exposing (clip)
 
 {-| Represents lenght of time since 00:00 in milliseconds. -}
-type alias Time_ a = { a | milliseconds : Int }
 
-type alias Time = Time_ {}
+type Time = Milliseconds Int
 
 fromMilliseconds : Int -> Time
-fromMilliseconds ms =
-  let
-    ms' = clip 1 86400000 ms
-  in
-   { milliseconds = ms' }
+fromMilliseconds ms = Milliseconds (clip 1 86400000 ms)
 
 fromSeconds : Int -> Time
 fromSeconds s = fromMilliseconds (s * 1000)
 
-seconds : Time_ a -> Int
-seconds t = t.milliseconds // 1000 % 60
+seconds : Time -> Int
+seconds (Milliseconds ms) = ms // 1000 % 60
 
-secondsTotal : Time_ a -> Int
-secondsTotal t = t.milliseconds // 1000
+secondsTotal : Time -> Int
+secondsTotal (Milliseconds ms) = ms // 1000
 
-milliseconds : Time_ a -> Int
-milliseconds t = t.milliseconds % 1000
+milliseconds : Time -> Int
+milliseconds (Milliseconds ms) = ms % 1000
 
-minutes : Time_ a -> Int
+minutes : Time -> Int
 minutes t = (secondsTotal t) // 60 % 60
 
-hours : Time_ a -> Int
+hours : Time -> Int
 hours t = (secondsTotal t) // 60 // 60 % 24
 
-toHMS : Time_ a -> (Int, Int, Int)
+toHMS : Time -> (Int, Int, Int)
 toHMS t = (hours t, minutes t, seconds t)
 
 fromHMS : (Int, Int, Int) -> Time
