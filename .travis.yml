@@ -1,17 +1,10 @@
 language: haskell
 install:
-  - git clone https://github.com/elm-lang/elm-compiler.git
-  - git clone https://github.com/elm-lang/elm-package.git
-  - git clone https://github.com/elm-lang/elm-make.git
-  - cd elm-make
-  - cabal sandbox init
-  - cabal sandbox add-source ../elm-compiler
-  - cabal sandbox add-source ../elm-package
-  - cabal install
-  - cd ..
+  - curl https://raw.githubusercontent.com/elm-lang/elm-platform/master/installers/BuildFromSource.hs > BuildFromSource.hs
+  - runhaskell BuildFromSource.hs 0.15.1
 before_script:
   - curl https://raw.githubusercontent.com/maxsnew/IO/1.0.1/elm-io.sh > ./elm-io.sh
   - chmod +x ./elm-io.sh
-  - ./elm-make/.cabal-sandbox/bin/elm-make --yes --output test.js Test.elm
+  - ./Elm-Platform/0.15.1/.cabal-sandbox/bin/elm-make --yes --output test.js Test.elm
   - ./elm-io.sh test.js test-io.js
 script: node test-io.js
