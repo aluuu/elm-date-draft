@@ -1,33 +1,54 @@
-module Draft.DateTime where
+module Draft.DateTime exposing (fromDateAndTime, add, subtract)
 
-import Draft.Date as T exposing ( Date, Date_)
-import Draft.Time as T exposing ( Time, Time_ )
-import Draft.TimeZone exposing ( TimeZone, utc )
-import Draft.Diff exposing ( Diff )
+import Draft.Date as T exposing (Date, Date_)
+import Draft.Time as T exposing (Time, Time_)
+import Draft.TimeZone exposing (TimeZone, utc)
+import Draft.Diff exposing (Diff)
 
-type alias DateTime = Date_ (Time_ {tz: TimeZone})
+
+type alias DateTime =
+  Date_ (Time_ { tz : TimeZone })
+
 
 fromDateAndTime : Date -> Time -> DateTime
-fromDateAndTime d t = {
-  julianDay=d.julianDay,
-  milliseconds=t.milliseconds,
-  tz=utc}
+fromDateAndTime d t =
+  { julianDay = d.julianDay
+  , milliseconds = t.milliseconds
+  , tz = utc
+  }
+
 
 add : Diff -> DateTime -> DateTime
 add diff datetime =
   let
-    totalTime = diff.milliseconds + datetime.milliseconds
-    newTime = if totalTime > 86400000 then totalTime % 86400000 else totalTime
-    secondsToAdd = if totalTime > 86400000 then totalTime // 86400000 else 0
-    daysToAdd = secondsToAdd // 86400
+    totalTime =
+      diff.milliseconds + datetime.milliseconds
+
+    newTime =
+      if totalTime > 86400000 then
+        totalTime % 86400000
+      else
+        totalTime
+
+    secondsToAdd =
+      if totalTime > 86400000 then
+        totalTime // 86400000
+      else
+        0
+
+    daysToAdd =
+      secondsToAdd // 86400
   in
-    {milliseconds = newTime,
-     julianDay = datetime.julianDay + daysToAdd,
-     tz = datetime.tz}
+    { milliseconds = newTime
+    , julianDay = datetime.julianDay + daysToAdd
+    , tz = datetime.tz
+    }
+
 
 subtract : Diff -> DateTime -> DateTime
 subtract diff datetime =
   let
-    invDiff = {milliseconds = -diff.milliseconds}
+    invDiff =
+      { milliseconds = -diff.milliseconds }
   in
     add invDiff datetime
